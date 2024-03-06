@@ -45,8 +45,8 @@ class ShipType(IntEnum):
     Battleship = enum.auto()
     Carrier = enum.auto()
     Hit = enum.auto()
-
-ShipTypeRepr = (".", "P", "C", "S", "B", "A", "x")
+    def __str__(self) -> str:
+        return (".", "P", "C", "S", "B", "A", "x")[self]
 
 class ShipOrientation(StrEnum):
     Horizontal = "H"
@@ -56,8 +56,8 @@ class PegType(IntEnum):
     Empty = enum.auto(0)
     Hit = enum.auto()
     Miss = enum.auto()
-
-PegTypeRepr = (".", "x", "o")
+    def __str__(self) -> str:
+        return (".", "x", "o")[self]
 
 class PlayerType(IntEnum):
     Human = enum.auto(0)
@@ -270,11 +270,11 @@ class Game:
         for i in reversed(range(self.boardSize)):
             line: str = "^ "
             for j in range(self.boardSize):
-                line += ShipTypeRepr[self.playerBoard[j][i]] + " "
+                line += str(self.playerBoard[j][i]) + " "
 
             line = line.rstrip() + self.boardsSeparator + "^ "
             for j in range(self.boardSize):
-                line += PegTypeRepr[self.trackingBoard[j][i]] + " "
+                line += str(self.trackingBoard[j][i]) + " "
 
             print(center(line.rstrip(), Game.TITLE_LENGTH, includeRight = False))
 
