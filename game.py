@@ -80,6 +80,38 @@ class Game:
         clear()
         print(Game.TitleText)
 
+    class Ship:
+        def __init__(self, x: int, y: int, type: ShipType, orientation: ShipOrientation):
+            self.type: ShipType = type
+            self.orientation: ShipOrientation = orientation
+
+            length: int = int(type)
+            offset: int = int(length / 2)
+
+            self.coords: list[tuple[int, int]] = []
+            self.hits: list[bool] = []
+            self.destroyed = False
+            self.untilDestroyed = length
+
+            if orientation == ShipOrientation.Horizontal:
+                start: int = x - offset
+                for i in range(length):
+                    self.coords.append((start + i, y))
+            else:
+                start: int = y - offset
+                for i in range(length):
+                    self.coords.append((x, start + i))
+
+            for i in range(length):
+                self.hits.append(False)
+
+        def setHit(self, x: int, y: int) -> None:
+            index: int = self.coords.index((x, y))
+            self.hits[index] = True
+            self.untilDestroyed -= 1
+            if self.untilDestroyed == 0:
+                self.destroyed = True
+
     def __init__(self, boardSize: int, shipsAmount: int, firstPlayer: PlayerType):
         self.boardSize: int = boardSize
         self.shipsAmount: int = shipsAmount
@@ -97,6 +129,9 @@ class Game:
                 self.playerBoard[i].append(ShipType.Empty)
                 self.machineBoard[i].append(ShipType.Empty)
                 self.trackingBoard[i].append(PegType.Empty)
+
+        self.playerShips: list[Game.Ship] = []
+        self.machineShips: list[Game.Ship] = []
 
         self.turn: PlayerType = firstPlayer
 
@@ -132,47 +167,40 @@ class Game:
     def getBoard(self, player: PlayerType) -> list[list[ShipType]]:
         return self.playerBoard if player == PlayerType.Human else self.machineBoard
 
+    def getShips(self, player: PlayerType) -> list[Ship]:
+        return self.playerShips if player == PlayerType.Human else self.machineShips
+
     def isValidCoords(self, x: int, y: int) -> bool:
         return x >= 0 and x < self.boardSize and y >= 0 and y < self.boardSize
 
-    def canPlaceShip(self, x: int, y: int, type: ShipType, orientation: ShipOrientation) -> bool:
-        length: int = int(type)
-        offset: int = int(length / 2)
-
-        if orientation == ShipOrientation.Horizontal:
-            beginX: int = x - offset
-            if not self.isValidCoords(beginX, y):
+    def canPlaceShip(self, ship: Ship) -> bool:
+        for x, y in ship.coords:
+            if not self.isValidCoords(x, y):
                 return False
-            endX: int = beginX + length
-            return self.isValidCoords(endX, y)
-        else:
-            beginY: int = y - offset
-            if not self.isValidCoords(x, beginY):
-                return False
-            endY: int = beginY + length
-            return self.isValidCoords(x, endY)
+        return True
 
     def hasShip(self, x: int, y: int) -> bool:
         return self.currentBoard[x][y] != ShipType.Empty
 
-    def placeShip(self, x: int, y: int, type: ShipType, orientation: ShipOrientation, player: PlayerType) -> None:
-        length: int = int(type)
-        offset: int = int(length / 2)
-        board: list[list[ShipType]] = self.getBoard(player)
+    def getShip(self, x: int, y: int, player: PlayerType) -> Ship | None:
+        for ship in self.getShips(player):
+            try:
+                ship.coords.index((x, y))
+                return ship
+            except:
+                continue
+        return None
 
+    def placeShip(self, ship: Ship, player: PlayerType) -> None:
+        length: int = int(ship.type)
         if player == PlayerType.Human:
             self.playerShipCells += length
         else:
             self.machineShipCells += length
 
-        if orientation == ShipOrientation.Horizontal:
-            start: int = x - offset
-            for i in range(length):
-                board[start + i][y] = type
-        else:
-            start: int = y - offset
-            for i in range(length):
-                board[x][start + i] = type
+        board: list[list[ShipType]] = self.getBoard(player)
+        for x, y in ship.coords:
+            board[x][y] = ship.type
 
     def placeMachineShips(self) -> None:
         placed: int = 0
@@ -182,13 +210,17 @@ class Game:
                 continue
             y: int = randrange(self.boardSize)
             orientation: ShipOrientation = ShipOrientation.getRandom()
-            if not self.isValidCoords(x, y) or not self.canPlaceShip(x, y, ShipType.Submarine, orientation):
+            ship: Game.Ship = Game.Ship(x, y, ShipType.Submarine, orientation)
+
+            if not self.isValidCoords(x, y) or not self.canPlaceShip(ship):
                 continue
-            self.placeShip(x, y, ShipType.Submarine, orientation, PlayerType.Machine)
+
+            self.placeShip(ship, PlayerType.Machine)
+            self.getShips(PlayerType.Machine).append(ship)
             self.machineBoard[x][y] = ShipType.Submarine
             placed += 1
 
-    def getShipPlacement(self, i: int) -> tuple[int, int, ShipType, ShipOrientation]:
+    def createShip(self, i: int) -> Ship:
         type: ShipType = ShipType.Submarine
         while True:
             raw = getInput(f"Enter ship #{i} position and orientation (format: x, y, H|V): ").split()
@@ -208,11 +240,13 @@ class Game:
             if orientation == None:
                 print("Invalid orientation value, try again")
                 continue
-            if not self.canPlaceShip(x, y, type, orientation):
+
+            ship: Game.Ship = Game.Ship(x, y, type, orientation)
+            if not self.canPlaceShip(ship):
                 print("Can't place a ship here, try again")
                 continue
 
-            return (x, y, type, orientation)
+            return ship
 
     def getShipPlacements(self) -> None:
         Game.printTitle()
@@ -223,8 +257,9 @@ class Game:
         ))}")
 
         for i in range(self.shipsAmount):
-            [x, y, type, orientation] = self.getShipPlacement(i + 1)
-            self.placeShip(x, y, type, orientation, PlayerType.Human)
+            ship: Game.Ship = self.createShip(i + 1)
+            self.placeShip(ship, PlayerType.Human)
+            self.getShips(PlayerType.Human).append(ship)
 
     def display(self, turn: bool = True) -> None:
         Game.printTitle()
@@ -265,9 +300,13 @@ class Game:
                 print("You already shot here")
                 continue
 
-            machineShip: ShipType = self.machineBoard[x][y]
-            miss: bool = machineShip == ShipType.Empty
-            print("Miss!" if miss else "Hit! You get another turn")
+            ship: Game.Ship | None = self.getShip(x, y, PlayerType.Machine)
+            miss: bool = ship == None
+            if miss:
+                print("Miss!")
+            else:
+                ship.setHit(x, y)
+                print(("Sunk! " if ship.destroyed else "Hit! ") + "You get another turn")
 
             if not miss:
                 self.machineShipCells -= 1
@@ -286,9 +325,13 @@ class Game:
                 continue
 
             print(f"Machine shoots at ({x + 1}, {y + 1})")
-            playerShip: ShipType = self.playerBoard[x][y]
-            miss: bool = playerShip == ShipType.Empty
-            print("Miss!" if miss else "Hit! The machine gets another turn")
+            ship: Game.Ship | None = self.getShip(x, y, PlayerType.Human)
+            miss: bool = ship == None
+            if miss:
+                print("Miss!")
+            else:
+                ship.setHit(x, y)
+                print(("Sunk! " if ship.destroyed else "Hit! ") + "You get another turn")
 
             if not miss:
                 self.playerShipCells -= 1
