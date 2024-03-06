@@ -89,21 +89,21 @@ class Game:
         self.trackingBoard: list[list[PegType]] = []
         self.machineBoard: list[list[ShipType]] = []
 
-        for i in range(self.boardSize):
+        for i in range(boardSize):
             self.playerBoard.append([])
             self.machineBoard.append([])
             self.trackingBoard.append([])
-            for _ in range(self.boardSize):
+            for _ in range(boardSize):
                 self.playerBoard[i].append(ShipType.Empty)
                 self.machineBoard[i].append(ShipType.Empty)
                 self.trackingBoard[i].append(PegType.Empty)
 
         self.turn: PlayerType = firstPlayer
 
-        boardDisplaySize: int = self.boardSize * 2 + 1
+        boardDisplaySize: int = boardSize * 2 + 1
         self.boardsSeparator: str = " " * Game.BoardsSeparation
         self.boardDirectionIndicator: str = center(
-            "  " + ("> " * self.boardSize).strip() + self.boardsSeparator + "  " + ("> " * self.boardSize).strip(),
+            "  " + ("> " * boardSize).strip() + self.boardsSeparator + "  " + ("> " * boardSize).strip(),
             Game.TitleLength,
             includeRight = False
         )
@@ -246,7 +246,7 @@ class Game:
             print(center(f"{self.turnName}'s turn", Game.TitleLength, includeRight = False))
             print()
 
-    def getShotTarget(self) -> None:
+    def getShotTarget(self) -> bool:
         while True:
             raw = getInput("Enter where do you want to shoot (x, y): ").split()
             if len(raw) != 2:
@@ -267,16 +267,16 @@ class Game:
 
             machineShip: ShipType = self.machineBoard[x][y]
             miss: bool = machineShip == ShipType.Empty
-            print("Miss!" if miss else "Hit!")
+            print("Miss!" if miss else "Hit! You get another turn")
 
             if not miss:
                 self.machineShipCells -= 1
 
             self.machineBoard[x][y] = ShipType.Hit
             self.trackingBoard[x][y] = PegType.Miss if miss else PegType.Hit
-            break
+            return not miss
 
-    def shootAtHuman(self) -> None:
+    def shootAtHuman(self) -> bool:
         while True:
             x: int = randrange(self.boardSize)
             if not self.isValidCoords(x, 0):
@@ -288,21 +288,23 @@ class Game:
             print(f"Machine shoots at ({x + 1}, {y + 1})")
             playerShip: ShipType = self.playerBoard[x][y]
             miss: bool = playerShip == ShipType.Empty
-            print("Miss!" if miss else "Hit!")
+            print("Miss!" if miss else "Hit! The machine gets another turn")
 
             if not miss:
                 self.playerShipCells -= 1
             self.playerBoard[x][y] = ShipType.Hit
-            break
+            return not miss
 
     def play(self) -> None:
         while self.playerShipCells and self.machineShipCells:
             self.display()
+            anotherTurn: bool
             if self.turn == PlayerType.Human:
-                self.getShotTarget()
+                anotherTurn = self.getShotTarget()
             else:
-                self.shootAtHuman()
-            self.turn = PlayerType.Human if self.turn == PlayerType.Machine else PlayerType.Machine
+                anotherTurn = self.shootAtHuman()
+            if not anotherTurn:
+                self.turn = PlayerType.Human if self.turn == PlayerType.Machine else PlayerType.Machine
             pause()
 
         self.display(False)
