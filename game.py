@@ -167,12 +167,12 @@ class Game:
     def isValidCoords(self, x: int, y: int) -> bool:
         return x >= 0 and x < self.boardSize and y >= 0 and y < self.boardSize
 
-    def hasShip(self, x: int, y: int) -> bool:
-        return self.currentBoard[x][y] != ShipType.Empty
+    def hasShip(self, x: int, y: int, player: PlayerType) -> bool:
+        return self.getBoard(player)[x][y] != ShipType.Empty
 
-    def canPlaceShip(self, ship: Ship) -> bool:
+    def canPlaceShip(self, ship: Ship, player: PlayerType) -> bool:
         for x, y in ship.coords:
-            if self.hasShip(x, y):
+            if self.hasShip(x, y, player):
                 return False
         return True
 
@@ -205,7 +205,7 @@ class Game:
             orientation: ShipOrientation = ShipOrientation.getRandom()
             ship: Game.Ship = Game.Ship(x, y, ShipType.Submarine, orientation)
 
-            if not self.isValidCoords(x, y) or not self.canPlaceShip(ship):
+            if not self.isValidCoords(x, y) or not self.canPlaceShip(ship, PlayerType.Machine):
                 continue
 
             self.placeShip(ship, PlayerType.Machine)
@@ -235,7 +235,7 @@ class Game:
                 continue
 
             ship: Game.Ship = Game.Ship(x, y, type, orientation)
-            if not self.canPlaceShip(ship):
+            if not self.canPlaceShip(ship, PlayerType.Human):
                 print("Can't place a ship here, try again")
                 continue
 
