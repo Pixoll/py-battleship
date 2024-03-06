@@ -51,6 +51,8 @@ class ShipType(IntEnum):
 class ShipOrientation(StrEnum):
     Horizontal = "H"
     Vertical = "V"
+    def __str__(self) -> str:
+        return self.value
 
 class PegType(IntEnum):
     Empty = enum.auto(0)
@@ -216,7 +218,7 @@ class Game:
     def createShip(self, i: int) -> Ship:
         type: ShipType = ShipType.Submarine
         while True:
-            raw = getInput(f"Enter ship #{i} position and orientation (format: x, y, H|V): ").split()
+            raw = getInput(f"Enter ship #{i} position and orientation (format: x, y, {"|".join(ShipOrientation.values())}): ").split()
             if len(raw) != 3:
                 print("Invalid format, try again")
                 continue
