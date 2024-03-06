@@ -5,8 +5,8 @@ def main():
     Game.printTitle()
 
     boardSize = toInt(getInput("Enter the board size: "))
-    while not boardSize or not Game.BoardSizeRange.count(boardSize):
-        print(f"Board size must be in range [{min(Game.BoardSizeRange)}, {max(Game.BoardSizeRange)}]")
+    while not boardSize or not Game.BOARD_SIZE_RANGE.count(boardSize):
+        print(f"Board size must be in range [{min(Game.BOARD_SIZE_RANGE)}, {max(Game.BOARD_SIZE_RANGE)}]")
         boardSize = toInt(getInput("Enter the board size: "))
 
     shipsAmountRange = Game.shipsAmountRange(boardSize)

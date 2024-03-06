@@ -57,59 +57,54 @@ class PegType(IntEnum):
     Hit = enum.auto()
     Miss = enum.auto()
 
-PegTypeRepr = (".", "H", "M")
+PegTypeRepr = (".", "x", "o")
 
 class PlayerType(IntEnum):
     Human = enum.auto(0)
     Machine = enum.auto()
 
 class Game:
-    BoardSizeRange: range = range(10, 1001)
-    ShipsAmountMin = 1
-    Name = "Py Battleship"
-    TitleLength = 100
-    TitleText = "#" * TitleLength + "\n#" + center(Name, TitleLength - 2) + "#\n" + "#" * TitleLength + "\n"
-    BoardsSeparation = 10
+    BOARD_SIZE_RANGE: range = range(10, 1001)
+    SHIPS_AMOUNT_MIN = 1
+    NAME = "Py Battleship"
+    TITLE_LENGTH = 100
+    TITLE_TEXT = "#" * TITLE_LENGTH + "\n#" + center(NAME, TITLE_LENGTH - 2) + "#\n" + "#" * TITLE_LENGTH + "\n"
+    SHIPS_REMAINING_TEXT = (center(" Ships remaining", TITLE_LENGTH, includeRight = False) + "\n"
+                            + center("  Human | Machine", TITLE_LENGTH, includeRight = False))
+    BOARDS_SEPARATION = 10
 
     @staticmethod
     def shipsAmountRange(N: int) -> range:
-        return range(Game.ShipsAmountMin, N + 1)
+        return range(Game.SHIPS_AMOUNT_MIN, N + 1)
 
     @staticmethod
     def printTitle() -> None:
         clear()
-        print(Game.TitleText)
+        print(Game.TITLE_TEXT)
 
     class Ship:
         def __init__(self, x: int, y: int, type: ShipType, orientation: ShipOrientation):
             self.type: ShipType = type
-            self.orientation: ShipOrientation = orientation
 
-            length: int = int(type)
-            offset: int = int(length / 2)
+            self.length: int = int(type)
+            offset: int = int(self.length / 2)
 
             self.coords: list[tuple[int, int]] = []
-            self.hits: list[bool] = []
             self.destroyed = False
-            self.untilDestroyed = length
+            self.hits = 0
 
             if orientation == ShipOrientation.Horizontal:
                 start: int = x - offset
-                for i in range(length):
+                for i in range(self.length):
                     self.coords.append((start + i, y))
             else:
                 start: int = y - offset
-                for i in range(length):
+                for i in range(self.length):
                     self.coords.append((x, start + i))
 
-            for i in range(length):
-                self.hits.append(False)
-
-        def setHit(self, x: int, y: int) -> None:
-            index: int = self.coords.index((x, y))
-            self.hits[index] = True
-            self.untilDestroyed -= 1
-            if self.untilDestroyed == 0:
+        def shootAt(self) -> None:
+            self.hits += 1
+            if self.hits == self.length:
                 self.destroyed = True
 
     def __init__(self, boardSize: int, shipsAmount: int, firstPlayer: PlayerType):
@@ -132,26 +127,25 @@ class Game:
 
         self.playerShips: list[Game.Ship] = []
         self.machineShips: list[Game.Ship] = []
+        self.playerRemainingShips: int = 0
+        self.machineRemainingShips: int = 0
 
         self.turn: PlayerType = firstPlayer
 
         boardDisplaySize: int = boardSize * 2 + 1
-        self.boardsSeparator: str = " " * Game.BoardsSeparation
+        self.boardsSeparator: str = " " * Game.BOARDS_SEPARATION
         self.boardDirectionIndicator: str = center(
             "  " + ("> " * boardSize).strip() + self.boardsSeparator + "  " + ("> " * boardSize).strip(),
-            Game.TitleLength,
+            Game.TITLE_LENGTH,
             includeRight = False
         )
         self.boardsTitles: str = center(
             center("Your board", boardDisplaySize)
             + self.boardsSeparator
             + center("Tracking board", boardDisplaySize),
-            Game.TitleLength,
+            Game.TITLE_LENGTH,
             includeRight = False
         ) + "\n"
-
-        self.playerShipCells: int = 0
-        self.machineShipCells: int = 0
 
     def __repr__(self) -> str:
         return f"Game({self.boardSize}, {self.shipsAmount}, PlayerType.{PlayerType.getName(self.firstPlayer)})"
@@ -173,14 +167,14 @@ class Game:
     def isValidCoords(self, x: int, y: int) -> bool:
         return x >= 0 and x < self.boardSize and y >= 0 and y < self.boardSize
 
-    def canPlaceShip(self, ship: Ship) -> bool:
-        for x, y in ship.coords:
-            if not self.isValidCoords(x, y):
-                return False
-        return True
-
     def hasShip(self, x: int, y: int) -> bool:
         return self.currentBoard[x][y] != ShipType.Empty
+
+    def canPlaceShip(self, ship: Ship) -> bool:
+        for x, y in ship.coords:
+            if self.hasShip(x, y):
+                return False
+        return True
 
     def getShip(self, x: int, y: int, player: PlayerType) -> Ship | None:
         for ship in self.getShips(player):
@@ -192,11 +186,10 @@ class Game:
         return None
 
     def placeShip(self, ship: Ship, player: PlayerType) -> None:
-        length: int = int(ship.type)
         if player == PlayerType.Human:
-            self.playerShipCells += length
+            self.playerRemainingShips += 1
         else:
-            self.machineShipCells += length
+            self.machineRemainingShips += 1
 
         board: list[list[ShipType]] = self.getBoard(player)
         for x, y in ship.coords:
@@ -263,22 +256,33 @@ class Game:
 
     def display(self, turn: bool = True) -> None:
         Game.printTitle()
+        print(Game.SHIPS_REMAINING_TEXT)
+
+        playerRemainingShips: str = str(self.playerRemainingShips)
+        machineRemainingShips: str = str(self.machineRemainingShips)
+        length: int = max(len(playerRemainingShips), len(machineRemainingShips))
+        playerRemainingShips = playerRemainingShips.rjust(length)
+        print(center(playerRemainingShips + " | " + machineRemainingShips, Game.TITLE_LENGTH, includeRight = False))
+        print()
+
         print(self.boardsTitles)
 
         for i in reversed(range(self.boardSize)):
             line: str = "^ "
             for j in range(self.boardSize):
                 line += ShipTypeRepr[self.playerBoard[j][i]] + " "
-            line = line.rstrip()
-            line += self.boardsSeparator + "^ "
+
+            line = line.rstrip() + self.boardsSeparator + "^ "
             for j in range(self.boardSize):
                 line += PegTypeRepr[self.trackingBoard[j][i]] + " "
-            print(center(line.rstrip(), Game.TitleLength, includeRight = False))
+
+            print(center(line.rstrip(), Game.TITLE_LENGTH, includeRight = False))
+
         print(self.boardDirectionIndicator)
 
         print()
         if turn:
-            print(center(f"{self.turnName}'s turn", Game.TitleLength, includeRight = False))
+            print(center(f"{self.turnName}'s turn", Game.TITLE_LENGTH, includeRight = False))
             print()
 
     def getShotTarget(self) -> bool:
@@ -305,11 +309,10 @@ class Game:
             if miss:
                 print("Miss!")
             else:
-                ship.setHit(x, y)
+                ship.shootAt()
                 print(("Sunk! " if ship.destroyed else "Hit! ") + "You get another turn")
-
-            if not miss:
-                self.machineShipCells -= 1
+                if ship.destroyed:
+                    self.machineRemainingShips -= 1
 
             self.machineBoard[x][y] = ShipType.Hit
             self.trackingBoard[x][y] = PegType.Miss if miss else PegType.Hit
@@ -330,30 +333,28 @@ class Game:
             if miss:
                 print("Miss!")
             else:
-                ship.setHit(x, y)
+                ship.shootAt()
                 print(("Sunk! " if ship.destroyed else "Hit! ") + "The machine gets another turn")
+                if ship.destroyed:
+                    self.playerRemainingShips -= 1
 
-            if not miss:
-                self.playerShipCells -= 1
             self.playerBoard[x][y] = ShipType.Hit
             return not miss
 
     def play(self) -> None:
-        while self.playerShipCells and self.machineShipCells:
+        while self.playerRemainingShips and self.machineRemainingShips:
             self.display()
-            anotherTurn: bool
-            if self.turn == PlayerType.Human:
-                anotherTurn = self.getShotTarget()
-            else:
-                anotherTurn = self.shootAtHuman()
-            if not anotherTurn:
+
+            hit: bool = self.getShotTarget() if self.turn == PlayerType.Human else self.shootAtHuman()
+            if not hit:
                 self.turn = PlayerType.Human if self.turn == PlayerType.Machine else PlayerType.Machine
+
             pause()
 
         self.display(False)
         print(center(
-            f"{'Human' if self.playerShipCells else 'Machine'} wins!",
-            Game.TitleLength,
+            f"{'Human' if self.playerRemainingShips else 'Machine'} wins!",
+            Game.TITLE_LENGTH,
             includeRight = False
         ))
         print()
