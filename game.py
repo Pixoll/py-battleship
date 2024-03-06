@@ -331,7 +331,7 @@ class Game:
                 print("Miss!")
             else:
                 ship.setHit(x, y)
-                print(("Sunk! " if ship.destroyed else "Hit! ") + "You get another turn")
+                print(("Sunk! " if ship.destroyed else "Hit! ") + "The machine gets another turn")
 
             if not miss:
                 self.playerShipCells -= 1
