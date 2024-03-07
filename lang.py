@@ -11,7 +11,7 @@ class Lang:
         for file in listdir(Lang.LANG_FOLDER):
             lang: str = file.split(".")[0]
             langMessages: dict[str, str] = {}
-            for line in open(Lang.LANG_FOLDER + file):
+            for line in open(Lang.LANG_FOLDER + file, encoding = "utf-8"):
                 if not len(line.strip()) or line.startswith("#"):
                     continue
                 [key, value] = line.split("=", 1)
