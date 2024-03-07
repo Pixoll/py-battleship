@@ -1,26 +1,27 @@
 from game import Game, PlayerType
+from lang import lang
 from util import close, getInput, toInt
 
 def main():
     Game.printTitle()
 
-    boardSize = toInt(getInput("Enter the board size: "))
+    boardSize = toInt(getInput(lang.getMessage("boardSizeInput")))
     while not boardSize or not Game.BOARD_SIZE_RANGE.count(boardSize):
-        print(f"Board size must be in range [{min(Game.BOARD_SIZE_RANGE)}, {max(Game.BOARD_SIZE_RANGE)}]")
-        boardSize = toInt(getInput("Enter the board size: "))
+        print(lang.getMessage("boardSizeWrongInput", min(Game.BOARD_SIZE_RANGE), max(Game.BOARD_SIZE_RANGE)))
+        boardSize = toInt(getInput(lang.getMessage("boardSizeInput")))
 
     shipsAmountRange = Game.shipsAmountRange(boardSize)
-    shipsAmount = toInt(getInput("Enter the ships amount: "))
+    shipsAmount = toInt(getInput(lang.getMessage("shipsAmountInput")))
     while not shipsAmount or not shipsAmountRange.count(shipsAmount):
-        print(f"Ships amount must be in range [{min(shipsAmountRange)}, {max(shipsAmountRange)}]")
-        shipsAmount = toInt(getInput("Enter the ships amount: "))
+        print(lang.getMessage("shipsAmountWrongInput", min(shipsAmountRange), max(shipsAmountRange)))
+        shipsAmount = toInt(getInput(lang.getMessage("shipsAmountInput")))
 
-    firstPlayer = PlayerType.getByName(getInput("Enter who starts first: ").capitalize())
+    firstPlayer = PlayerType.getByName(getInput(lang.getMessage("firstPlayerInput")).capitalize())
     while firstPlayer == None:
-        print(f"First player must be either {', '.join(map(
-            lambda a: f'or {a}' if PlayerType.names()[-1] == a else a, PlayerType.names()
-        ))}")
-        firstPlayer = PlayerType.getByName(getInput("Enter who starts first: ").capitalize())
+        print(lang.getMessage("firstPlayerWrongInput", ", ".join(map(
+            lambda a: f"or {a}" if PlayerType.names()[-1] == a else a, PlayerType.names()
+        ))))
+        firstPlayer = PlayerType.getByName(getInput(lang.getMessage("firstPlayerInput")).capitalize())
 
     game = Game(boardSize, shipsAmount, firstPlayer)
     game.getShipPlacements()

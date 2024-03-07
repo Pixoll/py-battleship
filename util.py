@@ -8,7 +8,7 @@ def pause() -> None:
     os.system("pause")
 
 def close(code: str | int | None = None) -> NoReturn:
-    print("Closing game...")
+    print("\nClosing game...")
     pause()
     exit(code)
 
