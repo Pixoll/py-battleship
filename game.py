@@ -234,7 +234,7 @@ class Game:
         while True:
             raw = getInput(lang.getMessage("createShipInput", i, "|".join(ShipOrientation.values()))).split()
             if len(raw) != 3:
-                print("Invalid format, try again")
+                print(lang.getMessage("createShipWrongInput"))
                 continue
 
             x: int | None = toInt(raw[0])
@@ -242,17 +242,17 @@ class Game:
             orientation: ShipOrientation | None = ShipOrientation.getByValue(raw[2].upper())
 
             if x == None or y == None or not self.isValidCoords(x - 1, y - 1):
-                print(lang.getMessage("createShipWrongInput"))
+                print(lang.getMessage("createShipInvalidCoords"))
                 continue
             x -= 1
             y -= 1
             if orientation == None:
-                print(lang.getMessage("createShipInvalidCoords"))
+                print(lang.getMessage("createShipInvalidOrientation"))
                 continue
 
             ship: Game.Ship = Game.Ship(x, y, type, orientation)
             if not self.canPlaceShip(ship, PlayerType.Human):
-                print(lang.getMessage("createShipInvalidOrientation"))
+                print(lang.getMessage("createShipCantPlace"))
                 continue
 
             return ship
