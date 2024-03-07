@@ -36,6 +36,12 @@ class Lang:
     def getLangName(self, id: str) -> str:
         return self.langs[id]["langName"]
 
+    def getLangId(self, name: str) -> str:
+        for k, v in self.langs.items():
+            if v["langName"] == name:
+                return k
+        return "en"
+
     def getMessage(self, key: str, *args: Any) -> str:
         value: str = self.langs[self.lang][key]
         if not len(args):

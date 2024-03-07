@@ -59,4 +59,5 @@ config = Config({
     "lang": "en",
     "langFolder": "./lang/",
     "savesFolder": "./saves/",
+    "firstLaunch": True
 })
