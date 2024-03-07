@@ -185,6 +185,8 @@ class Game:
 
     def canPlaceShip(self, ship: Ship, player: PlayerType) -> bool:
         for x, y in ship.coords:
+            if not self.isValidCoords(x, y):
+                return False
             for i in range(4):
                 nx: int = x + (1, -1, 0, 0)[i]
                 ny: int = y + (0, 0, -1, 1)[i]
@@ -218,10 +220,12 @@ class Game:
             if not self.isValidCoords(x, 0):
                 continue
             y: int = randrange(self.boardSize)
+            if not self.isValidCoords(x, y):
+                continue
+
             orientation: ShipOrientation = ShipOrientation.getRandom()
             ship: Game.Ship = Game.Ship(x, y, ShipType.Submarine, orientation)
-
-            if not self.isValidCoords(x, y) or not self.canPlaceShip(ship, PlayerType.Machine):
+            if not self.canPlaceShip(ship, PlayerType.Machine):
                 continue
 
             self.placeShip(ship, PlayerType.Machine)
