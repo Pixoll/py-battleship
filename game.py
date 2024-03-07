@@ -174,8 +174,11 @@ class Game:
 
     def canPlaceShip(self, ship: Ship, player: PlayerType) -> bool:
         for x, y in ship.coords:
-            if self.hasShip(x, y, player):
-                return False
+            for i in range(4):
+                nx: int = x + (1, -1, 0, 0)[i]
+                ny: int = y + (0, 0, -1, 1)[i]
+                if self.isValidCoords(nx, ny) and self.hasShip(nx, ny, player):
+                    return False
         return True
 
     def getShip(self, x: int, y: int, player: PlayerType) -> Ship | None:
