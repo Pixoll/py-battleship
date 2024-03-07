@@ -238,7 +238,7 @@ class Game:
         while True:
             raw = getInput(lang.getMessage("createShipInput", i, "|".join(ShipOrientation.values()))).split()
             if len(raw) != 3:
-                print(lang.getMessage("createShipWrongInput"))
+                print(lang.getMessage("invalidFormat"))
                 continue
 
             x: int | None = toInt(raw[0])
@@ -246,7 +246,7 @@ class Game:
             orientation: ShipOrientation | None = ShipOrientation.getByValue(raw[2].upper())
 
             if x == None or y == None or not self.isValidCoords(x - 1, y - 1):
-                print(lang.getMessage("createShipInvalidCoords"))
+                print(lang.getMessage("invalidCoords"))
                 continue
             x -= 1
             y -= 1
@@ -309,13 +309,13 @@ class Game:
         while True:
             raw = getInput(lang.getMessage("shootInput")).split()
             if len(raw) != 2:
-                print(lang.getMessage("shootWrongInput"))
+                print(lang.getMessage("invalidFormat"))
                 continue
 
             x: int | None = toInt(raw[0])
             y: int | None = toInt(raw[1])
             if x == None or y == None or not self.isValidCoords(x - 1, y - 1):
-                print(lang.getMessage("shootInvalidCoords"))
+                print(lang.getMessage("invalidCoords"))
                 continue
 
             x -= 1
