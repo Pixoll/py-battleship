@@ -1,12 +1,12 @@
-from config import config
+from settings import settings
 from os import listdir
 from typing import Any
 
 class Lang:
-    LANG_FOLDER = config.getSetting("langFolder")
+    LANG_FOLDER = settings.getValue("langFolder")
 
     def __init__(self) -> None:
-        self.lang = config.getSetting("lang")
+        self.lang = settings.getValue("lang")
         self.langs: dict[str, dict[str, str]] = {}
 
         for file in listdir(Lang.LANG_FOLDER):
@@ -25,7 +25,7 @@ class Lang:
 
     def setLang(self, lang: str) -> None:
         self.lang = lang
-        config.setSetting("lang", lang)
+        settings.setValue("lang", lang)
 
     def getLangs(self) -> list[str]:
         return [l for l in self.langs.keys()]

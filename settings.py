@@ -8,22 +8,22 @@ OpenTextMode: TypeAlias = Literal[
     'U', 'rU', 'Ur', 'rtU', 'rUt', 'Urt', 'trU', 'tUr', 'Utr'
 ]
 
-class Config:
+class Settings:
     CONFIG_FILE = "./battleship.properties"
 
     @staticmethod
     def getConfigFile(mode: OpenTextMode = "r") -> TextIOWrapper:
         try:
-            return open(Config.CONFIG_FILE, mode, encoding = "utf-8")
+            return open(Settings.CONFIG_FILE, mode, encoding = "utf-8")
         except:
-            tempFile = open(Config.CONFIG_FILE, "w")
+            tempFile = open(Settings.CONFIG_FILE, "w")
             tempFile.close()
-            return open(Config.CONFIG_FILE, mode, encoding = "utf-8")
+            return open(Settings.CONFIG_FILE, mode, encoding = "utf-8")
 
     def __init__(self, defaults: dict[str, Any]) -> None:
-        self.settings: dict[str, str] = {}
+        self.values: dict[str, str] = {}
 
-        configFile: TextIOWrapper = Config.getConfigFile()
+        configFile: TextIOWrapper = Settings.getConfigFile()
         rawData: list[str] = configFile.readlines()
         configFile.close()
 
@@ -31,31 +31,31 @@ class Config:
             if not len(line.strip()) or line.startswith("#"):
                 continue
             [key, value] = line.split("=", 1)
-            self.settings[key] = value.replace("\n", "").replace("''", "'")
+            self.values[key] = value.replace("\n", "").replace("''", "'")
 
         for k, v in defaults.items():
-            if self.settings.get(k):
+            if self.values.get(k):
                 continue
-            self.setSetting(k, v)
+            self.setValue(k, v)
 
-    def setSetting(self, key: str, value: Any) -> None:
-        if self.settings.get(key) and self.settings[key] == value:
+    def setValue(self, key: str, value: Any) -> None:
+        if self.values.get(key) and self.values[key] == value:
             return
 
-        self.settings[key] = str(value)
-        lines: list[str] = [f"{k}={v}\n" for k, v in self.settings.items()]
-        configFile: TextIOWrapper = Config.getConfigFile("w")
+        self.values[key] = str(value)
+        lines: list[str] = [f"{k}={v}\n" for k, v in self.values.items()]
+        configFile: TextIOWrapper = Settings.getConfigFile("w")
         configFile.writelines(lines)
         configFile.close()
 
-    def setSettings(self, settings: dict[str, Any]) -> None:
+    def setValues(self, settings: dict[str, Any]) -> None:
         for k, v in settings.items():
-            self.setSetting(k, v)
+            self.setValue(k, v)
 
-    def getSetting(self, key: str) -> str:
-        return self.settings.get(key, "")
+    def getValue(self, key: str) -> str:
+        return self.values.get(key, "")
 
-config = Config({
+settings = Settings({
     "lang": "en",
     "langFolder": "./lang/",
     "savesFolder": "./saves/",
