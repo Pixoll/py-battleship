@@ -15,9 +15,6 @@ class Enum(enum.Enum):
     def names(cls) -> list[str]:
         return cls._member_names_
     @classmethod
-    def getName(cls, index: int) -> str:
-        return cls._member_names_[index]
-    @classmethod
     def getRandom(cls) -> Self:
         names: list[str] = cls._member_names_
         index: int = randrange(len(names))
@@ -161,15 +158,11 @@ class Game:
         ) + "\n"
 
     def __repr__(self) -> str:
-        return f"Game({self.boardSize}, {self.shipsAmount}, PlayerType.{PlayerType.getName(self.firstPlayer)})"
+        return f"Game({self.boardSize}, {self.shipsAmount}, PlayerType.{self.firstPlayer.name})"
 
     @property
     def currentBoard(self) -> list[list[ShipType]]:
         return self.playerBoard if self.turn == PlayerType.Human else self.machineBoard
-
-    @property
-    def turnName(self) -> str:
-        return PlayerType.getName(self.turn)
 
     def getBoard(self, player: PlayerType) -> list[list[ShipType]]:
         return self.playerBoard if player == PlayerType.Human else self.machineBoard
@@ -263,6 +256,12 @@ class Game:
 
     def getShipPlacements(self) -> None:
         Game.printTitle()
+
+        print(lang.getMessage("boardSizeFinal", self.boardSize))
+        print(lang.getMessage("shipsAmountFinal", self.shipsAmount))
+        print(lang.getMessage("firstPlayerFinal", self.firstPlayer.name))
+        print()
+
         print(lang.getMessage("getShipPlacementCoords", self.boardSize))
         print(lang.getMessage("getShipPlacementOrientation", ", ".join(ShipOrientation.values())))
 
@@ -299,7 +298,7 @@ class Game:
 
         print()
         if turn:
-            print(center(lang.getMessage("turn", self.turnName), Game.TITLE_LENGTH, includeRight = False))
+            print(center(lang.getMessage("turn", self.turn.name), Game.TITLE_LENGTH, includeRight = False))
             print()
 
     def getShotTarget(self) -> bool:
