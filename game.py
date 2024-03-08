@@ -264,10 +264,7 @@ class Game:
     def getShipPlacements(self) -> None:
         Game.printTitle()
         print(lang.getMessage("getShipPlacementCoords", self.boardSize))
-        print(lang.getMessage("getShipPlacementOrientation", ", ".join(map(
-            lambda a: f"or {a}" if ShipOrientation.values()[-1] == a else a,
-            ShipOrientation.values()
-        ))))
+        print(lang.getMessage("getShipPlacementOrientation", ", ".join(ShipOrientation.values())))
 
         for i in range(self.shipsAmount):
             ship: Game.Ship = self.createShip(i + 1)
