@@ -1,48 +1,15 @@
-import enum
 from lang import lang
 from random import randrange
-from types import MappingProxyType
-from typing import Any, Self
-from util import center, clear, getInput, pause, toInt
-
-class Enum(enum.Enum):
-    _member_map_: dict[str, Self]
-    _value2member_map_: dict[str, Self]
-    @classmethod
-    def members(cls) -> MappingProxyType[str, Self]:
-        return cls.__members__
-    @classmethod
-    def names(cls) -> list[str]:
-        return cls._member_names_
-    @classmethod
-    def getRandom(cls) -> Self:
-        names: list[str] = cls._member_names_
-        index: int = randrange(len(names))
-        return cls._member_map_[names[index]]
-    @classmethod
-    def getByValue(cls, value: Any) -> Self | None:
-        return cls._value2member_map_.get(value)
-    @classmethod
-    def getByName(cls, name: str) -> Self | None:
-        return cls.__members__.get(name)
-    @classmethod
-    def values(cls) -> list[Self]:
-        return [x for x in cls.__members__.values()]
-
-class IntEnum(enum.IntEnum, Enum):
-    ""
-
-class StrEnum(enum.StrEnum, Enum):
-    ""
+from util import IntEnum, StrEnum, center, clear, enumAuto, getInput, pause, toInt
 
 class ShipType(IntEnum):
-    Empty = enum.auto(0)
-    Patrol = enum.auto()
-    Cruiser = enum.auto()
-    Submarine = enum.auto()
-    Battleship = enum.auto()
-    Carrier = enum.auto()
-    Hit = enum.auto()
+    Empty = enumAuto(0)
+    Patrol = enumAuto()
+    Cruiser = enumAuto()
+    Submarine = enumAuto()
+    Battleship = enumAuto()
+    Carrier = enumAuto()
+    Hit = enumAuto()
     def __str__(self) -> str:
         return (".", "P", "C", "S", "B", "A", "x")[self]
 
@@ -53,15 +20,15 @@ class ShipOrientation(StrEnum):
         return self.value
 
 class PegType(IntEnum):
-    Empty = enum.auto(0)
-    Hit = enum.auto()
-    Miss = enum.auto()
+    Empty = enumAuto(0)
+    Hit = enumAuto()
+    Miss = enumAuto()
     def __str__(self) -> str:
         return (".", "x", "o")[self]
 
 class PlayerType(IntEnum):
-    Human = enum.auto(0)
-    Machine = enum.auto()
+    Human = enumAuto(0)
+    Machine = enumAuto()
 
 class Game:
     BOARD_SIZE_RANGE: range = range(10, 1001)

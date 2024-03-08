@@ -1,11 +1,46 @@
-import os
-from typing import NoReturn
+import enum
+from os import system, name
+from random import randrange
+from types import MappingProxyType
+from typing import Any, NoReturn, Self
+
+class Enum(enum.Enum):
+    _member_map_: dict[str, Self]
+    _value2member_map_: dict[str, Self]
+    @classmethod
+    def members(cls) -> MappingProxyType[str, Self]:
+        return cls.__members__
+    @classmethod
+    def names(cls) -> list[str]:
+        return cls._member_names_
+    @classmethod
+    def getRandom(cls) -> Self:
+        names: list[str] = cls._member_names_
+        index: int = randrange(len(names))
+        return cls._member_map_[names[index]]
+    @classmethod
+    def getByValue(cls, value: Any) -> Self | None:
+        return cls._value2member_map_.get(value)
+    @classmethod
+    def getByName(cls, name: str) -> Self | None:
+        return cls.__members__.get(name)
+    @classmethod
+    def values(cls) -> list[Self]:
+        return [x for x in cls.__members__.values()]
+
+class IntEnum(enum.IntEnum, Enum):
+    ""
+
+class StrEnum(enum.StrEnum, Enum):
+    ""
+
+enumAuto = enum.auto
 
 def clear() -> None:
-    os.system("cls" if os.name == "nt" else "clear")
+    system("cls" if name == "nt" else "clear")
 
 def pause() -> None:
-    os.system("pause")
+    system("pause")
 
 def close(code: str | int | None = None) -> NoReturn:
     print("\nClosing game...")
