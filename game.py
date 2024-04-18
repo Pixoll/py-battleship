@@ -79,6 +79,21 @@ class Game:
         return range(Game.SHIPS_AMOUNT_MIN, N + 1)
 
     @staticmethod
+    def getBoardSize() -> int:
+        boardSize = toInt(getInput(lang.getMessage("boardSizeInput")))
+        while boardSize is None or not Game.BOARD_SIZE_RANGE.count(boardSize):
+            print(
+                lang.getMessage(
+                    "boardSizeWrongInput",
+                    min(Game.BOARD_SIZE_RANGE),
+                    max(Game.BOARD_SIZE_RANGE),
+                )
+            )
+            boardSize = toInt(getInput(lang.getMessage("boardSizeInput")))
+
+        return boardSize
+
+    @staticmethod
     def printTitle() -> None:
         clear()
         print(Game.titleText())

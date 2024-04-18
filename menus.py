@@ -22,7 +22,7 @@ class PlayMenu:
     @staticmethod
     def run() -> None:
         Game.printTitle()
-        boardSize = PlayMenu._getBoardSize()
+        boardSize = Game.getBoardSize()
         shipsAmount = PlayMenu._getShipsAmount(boardSize)
         firstPlayer = PlayMenu._getFirstPlayer()
 
@@ -30,21 +30,6 @@ class PlayMenu:
         game.getShipPlacements()
         game.placeMachineShips()
         game.play()
-
-    @staticmethod
-    def _getBoardSize() -> int:
-        boardSize = toInt(getInput(lang.getMessage("boardSizeInput")))
-        while boardSize is None or not Game.BOARD_SIZE_RANGE.count(boardSize):
-            print(
-                lang.getMessage(
-                    "boardSizeWrongInput",
-                    min(Game.BOARD_SIZE_RANGE),
-                    max(Game.BOARD_SIZE_RANGE),
-                )
-            )
-            boardSize = toInt(getInput(lang.getMessage("boardSizeInput")))
-
-        return boardSize
 
     @staticmethod
     def _getShipsAmount(boardSize: int) -> int:
