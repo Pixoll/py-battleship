@@ -2,6 +2,7 @@ from settings import settings
 from os import listdir
 from typing import Any
 
+
 class Lang:
     LANG_FOLDER = settings.getValue("langFolder")
 
@@ -13,7 +14,7 @@ class Lang:
             lang: str = file.split(".")[0]
             langMessages: dict[str, str] = {}
 
-            langFile = open(Lang.LANG_FOLDER + file, encoding = "utf-8")
+            langFile = open(Lang.LANG_FOLDER + file, encoding="utf-8")
             for line in langFile:
                 if not len(line.strip()) or line.startswith("#"):
                     continue
@@ -28,10 +29,10 @@ class Lang:
         settings.setValue("lang", lang)
 
     def getLangs(self) -> list[str]:
-        return [l for l in self.langs.keys()]
+        return [k for k in self.langs.keys()]
 
     def getLangNames(self) -> list[str]:
-        return [l["langName"] for l in self.langs.values()]
+        return [k["langName"] for k in self.langs.values()]
 
     def getLangName(self, id: str) -> str:
         return self.langs[id]["langName"]
@@ -49,5 +50,6 @@ class Lang:
         for i in range(len(args)):
             value = value.replace(f"{{{i}}}", str(args[i]))
         return value
+
 
 lang = Lang()

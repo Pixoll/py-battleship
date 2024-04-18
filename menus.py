@@ -12,6 +12,7 @@ class GreetingScreen:
         settings.setValue("firstLaunch", False)
         Game.printTitle()
 
+
 class PlayMenu:
     @staticmethod
     def getName() -> str:
@@ -21,25 +22,44 @@ class PlayMenu:
     def run() -> None:
         Game.printTitle()
         boardSize = toInt(getInput(lang.getMessage("boardSizeInput")))
-        while boardSize == None or not Game.BOARD_SIZE_RANGE.count(boardSize):
-            print(lang.getMessage("boardSizeWrongInput", min(Game.BOARD_SIZE_RANGE), max(Game.BOARD_SIZE_RANGE)))
+        while boardSize is None or not Game.BOARD_SIZE_RANGE.count(boardSize):
+            print(
+                lang.getMessage(
+                    "boardSizeWrongInput",
+                    min(Game.BOARD_SIZE_RANGE),
+                    max(Game.BOARD_SIZE_RANGE),
+                )
+            )
             boardSize = toInt(getInput(lang.getMessage("boardSizeInput")))
 
         shipsAmountRange = Game.shipsAmountRange(boardSize)
         shipsAmount = toInt(getInput(lang.getMessage("shipsAmountInput")))
-        while shipsAmount == None or not shipsAmountRange.count(shipsAmount):
-            print(lang.getMessage("shipsAmountWrongInput", min(shipsAmountRange), max(shipsAmountRange)))
+        while shipsAmount is None or not shipsAmountRange.count(shipsAmount):
+            print(
+                lang.getMessage(
+                    "shipsAmountWrongInput",
+                    min(shipsAmountRange),
+                    max(shipsAmountRange),
+                )
+            )
             shipsAmount = toInt(getInput(lang.getMessage("shipsAmountInput")))
 
-        firstPlayer = PlayerType.getByName(getInput(lang.getMessage("firstPlayerInput")).capitalize())
-        while firstPlayer == None:
-            print(lang.getMessage("firstPlayerWrongInput", ", ".join(PlayerType.names())))
-            firstPlayer = PlayerType.getByName(getInput(lang.getMessage("firstPlayerInput")).capitalize())
+        firstPlayer = PlayerType.getByName(
+            getInput(lang.getMessage("firstPlayerInput")).capitalize()
+        )
+        while firstPlayer is None:
+            print(
+                lang.getMessage("firstPlayerWrongInput", ", ".join(PlayerType.names()))
+            )
+            firstPlayer = PlayerType.getByName(
+                getInput(lang.getMessage("firstPlayerInput")).capitalize()
+            )
 
         game = Game(boardSize, shipsAmount, firstPlayer)
         game.getShipPlacements()
         game.placeMachineShips()
         game.play()
+
 
 class StatsMenu:
     @staticmethod
@@ -49,6 +69,7 @@ class StatsMenu:
     @staticmethod
     def run() -> None:
         pass
+
 
 class SettingsMenu:
     @staticmethod
@@ -73,13 +94,23 @@ class SettingsMenu:
     @staticmethod
     def getNewLang() -> str:
         language = getInput(lang.getMessage("langInput"))
-        while not (language in lang.getLangs()) and not (language.capitalize() in lang.getLangNames()):
-            print(lang.getMessage("langWrongInput", ", ".join(map(
-                lambda l: f"{lang.getLangName(l)} ({l})", lang.getLangs()
-            ))))
+        while language not in lang.getLangs() and language.capitalize() not in lang.getLangNames():
+            print(
+                lang.getMessage(
+                    "langWrongInput",
+                    ", ".join(
+                        map(lambda k: f"{lang.getLangName(k)} ({k})", lang.getLangs())
+                    ),
+                )
+            )
             language = getInput(lang.getMessage("langInput"))
 
-        return language if language in lang.getLangs() else lang.getLangId(language.capitalize())
+        return (
+            language
+            if language in lang.getLangs()
+            else lang.getLangId(language.capitalize())
+        )
+
 
 class MainMenu:
     MENUS = (PlayMenu, StatsMenu, SettingsMenu)
@@ -95,10 +126,20 @@ class MainMenu:
 
         menuName = getInput(lang.getMessage("selectMenu")).capitalize()
         menuInt = toInt(menuName)
-        while (menuInt == None or not MainMenu.MENUS_RANGE.count(menuInt - 1)) and not MainMenu.MENU_NAMES.count(menuName):
-            print(lang.getMessage("invalidMenu", ", ".join(map(
-                lambda m: f"{m} ({MainMenu.MENU_NAMES.index(m) + 1})", MainMenu.MENU_NAMES
-            ))))
+        while (
+            menuInt is None or not MainMenu.MENUS_RANGE.count(menuInt - 1)
+        ) and not MainMenu.MENU_NAMES.count(menuName):
+            print(
+                lang.getMessage(
+                    "invalidMenu",
+                    ", ".join(
+                        map(
+                            lambda m: f"{m} ({MainMenu.MENU_NAMES.index(m) + 1})",
+                            MainMenu.MENU_NAMES,
+                        )
+                    ),
+                )
+            )
             menuName = getInput(lang.getMessage("selectMenu")).capitalize()
             menuInt = toInt(menuName)
 

@@ -2,11 +2,61 @@ from io import TextIOWrapper
 from typing import Any, Literal, TypeAlias
 
 OpenTextMode: TypeAlias = Literal[
-    'r+', '+r', 'rt+', 'r+t', '+rt', 'tr+', 't+r', '+tr', 'w+', '+w', 'wt+', 'w+t', '+wt', 'tw+',
-    't+w', '+tw', 'a+', '+a', 'at+', 'a+t', '+at', 'ta+', 't+a', '+ta', 'x+', '+x', 'xt+', 'x+t',
-    '+xt', 'tx+', 't+x', '+tx', 'w', 'wt', 'tw', 'a', 'at', 'ta', 'x', 'xt', 'tx', 'r', 'rt', 'tr',
-    'U', 'rU', 'Ur', 'rtU', 'rUt', 'Urt', 'trU', 'tUr', 'Utr'
+    "r+",
+    "+r",
+    "rt+",
+    "r+t",
+    "+rt",
+    "tr+",
+    "t+r",
+    "+tr",
+    "w+",
+    "+w",
+    "wt+",
+    "w+t",
+    "+wt",
+    "tw+",
+    "t+w",
+    "+tw",
+    "a+",
+    "+a",
+    "at+",
+    "a+t",
+    "+at",
+    "ta+",
+    "t+a",
+    "+ta",
+    "x+",
+    "+x",
+    "xt+",
+    "x+t",
+    "+xt",
+    "tx+",
+    "t+x",
+    "+tx",
+    "w",
+    "wt",
+    "tw",
+    "a",
+    "at",
+    "ta",
+    "x",
+    "xt",
+    "tx",
+    "r",
+    "rt",
+    "tr",
+    "U",
+    "rU",
+    "Ur",
+    "rtU",
+    "rUt",
+    "Urt",
+    "trU",
+    "tUr",
+    "Utr",
 ]
+
 
 class Settings:
     CONFIG_FILE = "./battleship.properties"
@@ -14,11 +64,11 @@ class Settings:
     @staticmethod
     def getConfigFile(mode: OpenTextMode = "r") -> TextIOWrapper:
         try:
-            return open(Settings.CONFIG_FILE, mode, encoding = "utf-8")
-        except:
+            return open(Settings.CONFIG_FILE, mode, encoding="utf-8")
+        except OSError:
             tempFile = open(Settings.CONFIG_FILE, "w")
             tempFile.close()
-            return open(Settings.CONFIG_FILE, mode, encoding = "utf-8")
+            return open(Settings.CONFIG_FILE, mode, encoding="utf-8")
 
     def __init__(self, defaults: dict[str, Any]) -> None:
         self.values: dict[str, str] = {}
@@ -55,9 +105,12 @@ class Settings:
     def getValue(self, key: str) -> str:
         return self.values.get(key, "")
 
-settings = Settings({
-    "lang": "en",
-    "langFolder": "./lang/",
-    "savesFolder": "./saves/",
-    "firstLaunch": True
-})
+
+settings = Settings(
+    {
+        "lang": "en",
+        "langFolder": "./lang/",
+        "savesFolder": "./saves/",
+        "firstLaunch": True,
+    }
+)
