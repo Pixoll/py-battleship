@@ -7,22 +7,15 @@ class GreetingScreen:
     @staticmethod
     def run() -> None:
         Game.printTitle()
-        language = getInput(lang.getMessage("langInput"))
-        while not (language in lang.getLangs()) and not (language.capitalize() in lang.getLangNames()):
-            print(lang.getMessage("langWrongInput", ", ".join(map(
-                lambda l: f"{lang.getLangName(l)} ({l})", lang.getLangs()
-            ))))
-            language = getInput(lang.getMessage("langInput"))
-
-        if not (language in lang.getLangs()):
-            language = lang.getLangId(language.capitalize())
-
+        language = SettingsMenu.getNewLang()
         lang.setLang(language)
         settings.setValue("firstLaunch", False)
         Game.printTitle()
 
 class PlayMenu:
-    NAME = lang.getMessage("playMenuName")
+    @staticmethod
+    def getName() -> str:
+        return lang.getMessage("playMenuName")
 
     @staticmethod
     def run() -> None:
@@ -49,22 +42,48 @@ class PlayMenu:
         game.play()
 
 class StatsMenu:
-    NAME = lang.getMessage("statsMenuName")
+    @staticmethod
+    def getName() -> str:
+        return lang.getMessage("statsMenuName")
 
     @staticmethod
     def run() -> None:
         pass
 
 class SettingsMenu:
-    NAME = lang.getMessage("settingsMenuName")
+    @staticmethod
+    def getName() -> str:
+        return lang.getMessage("settingsMenuName")
+
+    @staticmethod
+    def getSettingsNames() -> tuple[str, ...]:
+        return (lang.getMessage("changeLangSetting"),)
+
+    @staticmethod
+    def getSettingsRange() -> range:
+        return range(len(SettingsMenu.getSettingsNames()))
 
     @staticmethod
     def run() -> None:
-        pass
+        Game.printTitle()
+        for i in SettingsMenu.getSettingsRange():
+            print(f"{i + 1}. {SettingsMenu.getSettingsNames()[i]}")
+        print()
+
+    @staticmethod
+    def getNewLang() -> str:
+        language = getInput(lang.getMessage("langInput"))
+        while not (language in lang.getLangs()) and not (language.capitalize() in lang.getLangNames()):
+            print(lang.getMessage("langWrongInput", ", ".join(map(
+                lambda l: f"{lang.getLangName(l)} ({l})", lang.getLangs()
+            ))))
+            language = getInput(lang.getMessage("langInput"))
+
+        return language if language in lang.getLangs() else lang.getLangId(language.capitalize())
 
 class MainMenu:
     MENUS = (PlayMenu, StatsMenu, SettingsMenu)
-    MENU_NAMES = tuple(m.NAME for m in MENUS)
+    MENU_NAMES = tuple(m.getName() for m in MENUS)
     MENUS_RANGE = range(len(MENUS))
 
     @staticmethod
