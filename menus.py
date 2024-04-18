@@ -3,6 +3,7 @@ from game import Game, PlayerType
 from lang import lang
 from util import getInput, toInt
 
+
 class GreetingScreen:
     @staticmethod
     def run() -> None:
@@ -21,6 +22,17 @@ class PlayMenu:
     @staticmethod
     def run() -> None:
         Game.printTitle()
+        boardSize = PlayMenu._getBoardSize()
+        shipsAmount = PlayMenu._getShipsAmount(boardSize)
+        firstPlayer = PlayMenu._getFirstPlayer()
+
+        game = Game(boardSize, shipsAmount, firstPlayer)
+        game.getShipPlacements()
+        game.placeMachineShips()
+        game.play()
+
+    @staticmethod
+    def _getBoardSize() -> int:
         boardSize = toInt(getInput(lang.getMessage("boardSizeInput")))
         while boardSize is None or not Game.BOARD_SIZE_RANGE.count(boardSize):
             print(
@@ -32,6 +44,10 @@ class PlayMenu:
             )
             boardSize = toInt(getInput(lang.getMessage("boardSizeInput")))
 
+        return boardSize
+
+    @staticmethod
+    def _getShipsAmount(boardSize: int) -> int:
         shipsAmountRange = Game.shipsAmountRange(boardSize)
         shipsAmount = toInt(getInput(lang.getMessage("shipsAmountInput")))
         while shipsAmount is None or not shipsAmountRange.count(shipsAmount):
@@ -44,6 +60,10 @@ class PlayMenu:
             )
             shipsAmount = toInt(getInput(lang.getMessage("shipsAmountInput")))
 
+        return shipsAmount
+
+    @staticmethod
+    def _getFirstPlayer() -> PlayerType:
         firstPlayer = PlayerType.getByName(
             getInput(lang.getMessage("firstPlayerInput")).capitalize()
         )
@@ -55,10 +75,7 @@ class PlayMenu:
                 getInput(lang.getMessage("firstPlayerInput")).capitalize()
             )
 
-        game = Game(boardSize, shipsAmount, firstPlayer)
-        game.getShipPlacements()
-        game.placeMachineShips()
-        game.play()
+        return firstPlayer
 
 
 class StatsMenu:
@@ -94,7 +111,10 @@ class SettingsMenu:
     @staticmethod
     def getNewLang() -> str:
         language = getInput(lang.getMessage("langInput"))
-        while language not in lang.getLangs() and language.capitalize() not in lang.getLangNames():
+        while (
+            language not in lang.getLangs()
+            and language.capitalize() not in lang.getLangNames()
+        ):
             print(
                 lang.getMessage(
                     "langWrongInput",
