@@ -39,7 +39,7 @@ class PlayerType(IntEnum):
 
 
 class Game:
-    BOARD_SIZE_RANGE: range = range(10, 1001)
+    BOARD_SIZE_RANGE: range = range(10, 21)
     SHIPS_AMOUNT_MIN = 1
     TITLE_LENGTH = 100
     TITLE_FRAME = "#" * TITLE_LENGTH
