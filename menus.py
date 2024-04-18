@@ -114,28 +114,29 @@ class SettingsMenu:
 
 class MainMenu:
     MENUS = (PlayMenu, StatsMenu, SettingsMenu)
-    MENU_NAMES = tuple(m.getName() for m in MENUS)
     MENUS_RANGE = range(len(MENUS))
 
     @staticmethod
     def run() -> None:
+        menuNames = tuple(m.getName() for m in MainMenu.MENUS)
+
         Game.printTitle()
         for i in MainMenu.MENUS_RANGE:
-            print(f"{i + 1}. {MainMenu.MENU_NAMES[i]}")
+            print(f"{i + 1}. {menuNames[i]}")
         print()
 
         menuName = getInput(lang.getMessage("selectMenu")).capitalize()
         menuInt = toInt(menuName)
         while (
             menuInt is None or not MainMenu.MENUS_RANGE.count(menuInt - 1)
-        ) and not MainMenu.MENU_NAMES.count(menuName):
+        ) and not menuNames.count(menuName):
             print(
                 lang.getMessage(
                     "invalidMenu",
                     ", ".join(
                         map(
-                            lambda m: f"{m} ({MainMenu.MENU_NAMES.index(m) + 1})",
-                            MainMenu.MENU_NAMES,
+                            lambda m: f"{m} ({menuNames.index(m) + 1})",
+                            menuNames,
                         )
                     ),
                 )
@@ -143,6 +144,6 @@ class MainMenu:
             menuName = getInput(lang.getMessage("selectMenu")).capitalize()
             menuInt = toInt(menuName)
 
-        menuIndex: int = menuInt - 1 if menuInt else MainMenu.MENU_NAMES.index(menuName)
+        menuIndex: int = menuInt - 1 if menuInt else menuNames.index(menuName)
         menu = MainMenu.MENUS[menuIndex]
         menu.run()
