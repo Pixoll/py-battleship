@@ -71,7 +71,9 @@ def toInt(str: str) -> int | None:
 def getInput(prompt: str) -> str:
     try:
         return input(prompt)
-    except EOFError | KeyboardInterrupt:
+    except EOFError:
+        close(0)
+    except KeyboardInterrupt:
         close(0)
 
 
