@@ -1,7 +1,7 @@
 from settings import settings
 from game import Game, PlayerType
 from lang import lang
-from util import getInput, toInt
+from util import getInput, iterableToText, listToText, toInt
 
 
 class GreetingScreen:
@@ -69,7 +69,7 @@ class PlayMenu:
         )
         while firstPlayer is None:
             print(
-                lang.getMessage("firstPlayerWrongInput", ", ".join(PlayerType.names()))
+                lang.getMessage("firstPlayerWrongInput", listToText(PlayerType.names()))
             )
             firstPlayer = PlayerType.getByName(
                 getInput(lang.getMessage("firstPlayerInput")).capitalize()
@@ -118,7 +118,7 @@ class SettingsMenu:
             print(
                 lang.getMessage(
                     "langWrongInput",
-                    ", ".join(
+                    iterableToText(
                         map(lambda k: f"{lang.getLangName(k)} ({k})", lang.getLangs())
                     ),
                 )
@@ -153,7 +153,7 @@ class MainMenu:
             print(
                 lang.getMessage(
                     "invalidMenu",
-                    ", ".join(
+                    iterableToText(
                         map(
                             lambda m: f"{m} ({menuNames.index(m) + 1})",
                             menuNames,

@@ -1,6 +1,6 @@
 from lang import lang
 from random import randrange
-from util import IntEnum, StrEnum, center, clear, enumAuto, getInput, pause, toInt
+from util import IntEnum, StrEnum, center, clear, enumAuto, getInput, listToText, pause, toInt
 
 
 class ShipType(IntEnum):
@@ -271,7 +271,7 @@ class Game:
         print(lang.getMessage("getShipPlacementCoords", self.boardSize))
         print(
             lang.getMessage(
-                "getShipPlacementOrientation", ", ".join(ShipOrientation.values())
+                "getShipPlacementOrientation", listToText(ShipOrientation.values())
             )
         )
 

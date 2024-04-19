@@ -2,7 +2,9 @@ import enum
 from os import system, name
 from random import randrange
 from types import MappingProxyType
-from typing import Any, NoReturn, Self
+from typing import Any, Iterable, NoReturn, Self
+
+from lang import lang
 
 
 class Enum(enum.Enum):
@@ -83,3 +85,17 @@ def center(text: str, length: int, filler: str = " ", includeRight: bool = True)
     if includeRight:
         result = result.ljust(length, filler)
     return result
+
+
+def listToText(list: list[Any]) -> str:
+    text: str = ""
+    for i in range(len(list) - 1):
+        text += list[i] + ", "
+    if len(list) > 1:
+        text += lang.getMessage("listToTextConnector") + " "
+    text += list[-1]
+    return text
+
+
+def iterableToText(iterable: Iterable[Any]) -> str:
+    return listToText(list(iterable))
