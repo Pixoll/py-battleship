@@ -48,7 +48,7 @@ class Lang:
         if not len(args):
             return value
         for i in range(len(args)):
-            value = value.replace(f"{{{i}}}", str(args[i]))
+            value = value.replace("{}", str(args[i]), 1)
         return value
 
 
